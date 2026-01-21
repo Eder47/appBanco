@@ -1,0 +1,79 @@
+package com.bancario.controller;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bancario.dto.MovimientoDTO;
+import com.bancario.model.Movimiento;
+import com.bancario.service.MovimientoService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/movimientos")
+@RequiredArgsConstructor
+public class MovimientoController {
+    
+	@Autowired
+    private MovimientoService movimientoService;
+    
+    @PostMapping
+    public ResponseEntity<Movimiento> realizarMovimiento(@Valid @RequestBody MovimientoDTO movimientoDTO) {
+        try {
+            Movimiento movimiento = movimientoService.realizarMovimiento(movimientoDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(movimiento);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    @GetMapping("/cuenta/{numeroCuenta}")
+    public ResponseEntity<List<Movimiento>> getMovimientosPorCuenta(@PathVariable String numeroCuenta) {
+        List<Movimiento> movimientos = movimientoService.getMovimientosPorCuenta(numeroCuenta);
+        return ResponseEntity.ok(movimientos);
+    }
+    
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<List<MovimientoDTO>> getMovimientosPorCliente(@PathVariable Long clienteId) {
+        List<MovimientoDTO> movimientos = movimientoService.getMovimientosPorCliente(clienteId);
+        return ResponseEntity.ok(movimientos);
+    }
+    
+    @GetMapping("/cliente/{clienteId}/fecha")
+    public ResponseEntity<List<Movimiento>> getMovimientosPorClienteYFecha(
+            @PathVariable Long clienteId,
+            @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate fechaInicio,
+            @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate fechaFin) {
+        
+        List<Movimiento> movimientos = movimientoService
+                .getMovimientosPorClienteYFecha(clienteId, fechaInicio, fechaFin);
+        return ResponseEntity.ok(movimientos);
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<Movimiento> getMovimientoById(@PathVariable Long id) {
+        return movimientoService.getMovimientoById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarMovimiento(@PathVariable Long id) {
+        movimientoService.eliminarMovimiento(id);
+        return ResponseEntity.noContent().build();
+    }
+}
