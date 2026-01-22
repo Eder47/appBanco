@@ -10,15 +10,15 @@ public interface CuentaService {
 
     Cuenta crearCuenta(CuentaDTO dto);
 
-    List<Cuenta> getAllCuentas();
+    List<CuentaDTO> getAllCuentas();
 
-    Optional<Cuenta> getCuentaByNumero(String numeroCuenta);
+    Optional<CuentaDTO> getCuentaByNumero(String numeroCuenta);
 
-    List<Cuenta> getCuentasByClienteId(Long clienteId);
+    List<CuentaDTO> getCuentasByClienteId(Long clienteId);
 
-    List<Cuenta> getCuentasActivasByClienteId(Long clienteId);
+    List<CuentaDTO> getCuentasActivasByClienteId(Long clienteId);
 
-    Cuenta actualizarCuenta(String numeroCuenta, CuentaDTO dto);
+    CuentaDTO actualizarCuenta(String numeroCuenta, CuentaDTO dto);
 
     void eliminarCuenta(String numeroCuenta);
 

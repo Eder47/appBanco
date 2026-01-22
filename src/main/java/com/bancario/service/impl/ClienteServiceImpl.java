@@ -18,74 +18,69 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ClienteServiceImpl implements ClienteService{
+public class ClienteServiceImpl implements ClienteService {
 
-    private final ClienteRepository clienteRepository;
-    private final ModelMapper mapper;
+	private final ClienteRepository clienteRepository;
+	private final ModelMapper mapper;
 
-    private final Predicate<Cliente> clienteActivoPredicate =
-            cliente -> cliente.getEstado() != null && cliente.getEstado();
+	private final Predicate<Cliente> clienteActivoPredicate = cliente -> cliente.getEstado() != null
+			&& cliente.getEstado();
 
-    @Transactional
-    public Cliente crearCliente(ClienteDTO clienteDTO) {
+	@Transactional
+	public ClienteDTO crearCliente(ClienteDTO clienteDTO) {
+		if (clienteRepository.existsByIdentificacion(clienteDTO.getIdentificacion())) {
+			throw new RuntimeException("Identificación ya registrada");
+		}
 
-        if (clienteRepository.existsByIdentificacion(clienteDTO.getIdentificacion())) {
-            throw new RuntimeException("Identificación ya registrada");
-        }
+		Cliente cliente = mapper.map(clienteDTO, Cliente.class);
+		Cliente clienteGuardado = clienteRepository.save(cliente);
 
-        Cliente cliente = mapper.map(clienteDTO, Cliente.class);
-        return clienteRepository.save(cliente);
-    }
+		return mapper.map(clienteGuardado, ClienteDTO.class);
+	}
 
-    @Transactional(readOnly = true)
-    public List<Cliente> getAllClientes() {
-        return clienteRepository.findAll()
-                .stream()
-                .filter(clienteActivoPredicate)
-                .collect(Collectors.toList());
-    }
+	@Transactional(readOnly = true)
+	public List<ClienteDTO> getAllClientes() {
+		return clienteRepository.findAll().stream().filter(clienteActivoPredicate)
+				.map(cliente -> mapper.map(cliente, ClienteDTO.class)).toList();
+	}
 
-    @Transactional(readOnly = true)
-    public Optional<Cliente> getClienteById(Long id) {
-        return clienteRepository.findById(id)
-                .filter(clienteActivoPredicate);
-    }
+	@Transactional(readOnly = true)
+	public Optional<ClienteDTO> getClienteById(Long id) {
+		return clienteRepository.findById(id).filter(clienteActivoPredicate)
+				.map(cliente -> mapper.map(cliente, ClienteDTO.class));
+	}
 
-    @Transactional(readOnly = true)
-    public Optional<Cliente> getClienteByIdentificacion(String identificacion) {
-        return clienteRepository.findByIdentificacion(identificacion)
-                .filter(clienteActivoPredicate);
-    }
+	@Transactional(readOnly = true)
+	public Optional<ClienteDTO> getClienteByIdentificacion(String identificacion) {
+		return clienteRepository.findByIdentificacion(identificacion).filter(clienteActivoPredicate)
+				.map(cliente -> mapper.map(cliente, ClienteDTO.class));
+	}
 
-    @Transactional
-    public Cliente actualizarCliente(Long id, ClienteDTO clienteDTO) {
+	@Transactional
+	public ClienteDTO actualizarCliente(Long id, ClienteDTO clienteDTO) {
+		Cliente clienteActualizado = clienteRepository.findById(id).map(cliente -> {
+			mapper.map(clienteDTO, cliente);
+			if (clienteDTO.getContrasena() == null) {
+				cliente.setContrasena(cliente.getContrasena()); // conservar la contraseña
+			}
+			return clienteRepository.save(cliente);
+		}).orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
-        return clienteRepository.findById(id)
-                .map(cliente -> {
-                    mapper.map(clienteDTO, cliente);
-                    if (clienteDTO.getContrasena() == null) {
-                        cliente.setContrasena(cliente.getContrasena());
-                    }
+		return mapper.map(clienteActualizado, ClienteDTO.class);
+	}
 
-                    return clienteRepository.save(cliente);
-                })
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-    }
+	@Transactional
+	public void eliminarCliente(Long id) {
+		clienteRepository.findById(id).ifPresent(cliente -> {
+			cliente.setEstado(false);
+			clienteRepository.save(cliente);
+		});
+	}
 
-    @Transactional
-    public void eliminarCliente(Long id) {
-        clienteRepository.findById(id)
-                .ifPresent(cliente -> {
-                    cliente.setEstado(false);
-                    clienteRepository.save(cliente);
-                });
-    }
+	@Transactional(readOnly = true)
+	public List<ClienteDTO> buscarPorNombre(String nombre) {
+		return clienteRepository.buscarPorNombre(nombre).stream().filter(clienteActivoPredicate)
+				.map(cliente -> mapper.map(cliente, ClienteDTO.class)).toList();
+	}
 
-    @Transactional(readOnly = true)
-    public List<Cliente> buscarPorNombre(String nombre) {
-        return clienteRepository.buscarPorNombre(nombre)
-                .stream()
-                .filter(clienteActivoPredicate)
-                .collect(Collectors.toList());
-    }
 }

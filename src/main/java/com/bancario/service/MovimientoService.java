@@ -1,27 +1,26 @@
 package com.bancario.service;
 
-import com.bancario.dto.MovimientoDTO;
-import com.bancario.model.Movimiento;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import com.bancario.dto.MovimientoDTO;
+
 public interface MovimientoService {
 
-    Movimiento realizarMovimiento(MovimientoDTO dto);
+	MovimientoDTO realizarMovimiento(MovimientoDTO dto);
 
-    List<Movimiento> getMovimientosPorCuenta(String numeroCuenta);
+    List<MovimientoDTO> getMovimientosPorCuenta(String numeroCuenta);
 
     List<MovimientoDTO> getMovimientosPorCliente(Long clienteId);
 
-    List<Movimiento> getMovimientosPorClienteYFecha(
+    List<MovimientoDTO> getMovimientosPorClienteYFecha(
             Long clienteId,
             LocalDate fechaInicio,
             LocalDate fechaFin
     );
 
-    Optional<Movimiento> getMovimientoById(Long id);
+    Optional<MovimientoDTO> getMovimientoById(Long id);
 
     void eliminarMovimiento(Long id);
 

@@ -1,24 +1,23 @@
 package com.bancario.service;
 
-import com.bancario.dto.ClienteDTO;
-import com.bancario.model.Cliente;
-
 import java.util.List;
 import java.util.Optional;
 
+import com.bancario.dto.ClienteDTO;
+
 public interface ClienteService {
 
-    Cliente crearCliente(ClienteDTO clienteDTO);
+	ClienteDTO crearCliente(ClienteDTO clienteDTO);
 
-    List<Cliente> getAllClientes();
+    List<ClienteDTO> getAllClientes();
 
-    Optional<Cliente> getClienteById(Long id);
+    Optional<ClienteDTO> getClienteById(Long id);
 
-    Optional<Cliente> getClienteByIdentificacion(String identificacion);
+    Optional<ClienteDTO> getClienteByIdentificacion(String identificacion);
 
-    Cliente actualizarCliente(Long id, ClienteDTO clienteDTO);
+    ClienteDTO actualizarCliente(Long id, ClienteDTO clienteDTO);
 
     void eliminarCliente(Long id);
 
-    List<Cliente> buscarPorNombre(String nombre);
+    List<ClienteDTO> buscarPorNombre(String nombre);
 }

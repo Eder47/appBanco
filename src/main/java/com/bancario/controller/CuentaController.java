@@ -43,36 +43,36 @@ public class CuentaController {
     }
     
     @GetMapping
-    public ResponseEntity<List<Cuenta>> getAllCuentas() {
-        List<Cuenta> cuentas = cuentaService.getAllCuentas();
+    public ResponseEntity<List<CuentaDTO>> getAllCuentas() {
+        List<CuentaDTO> cuentas = cuentaService.getAllCuentas();
         return ResponseEntity.ok(cuentas);
     }
     
     @GetMapping("/{numeroCuenta}")
-    public ResponseEntity<Cuenta> getCuentaByNumero(@PathVariable String numeroCuenta) {
+    public ResponseEntity<CuentaDTO> getCuentaByNumero(@PathVariable String numeroCuenta) {
         return cuentaService.getCuentaByNumero(numeroCuenta)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
     
     @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<List<Cuenta>> getCuentasByCliente(@PathVariable Long clienteId) {
-        List<Cuenta> cuentas = cuentaService.getCuentasByClienteId(clienteId);
+    public ResponseEntity<List<CuentaDTO>> getCuentasByCliente(@PathVariable Long clienteId) {
+        List<CuentaDTO> cuentas = cuentaService.getCuentasByClienteId(clienteId);
         return ResponseEntity.ok(cuentas);
     }
     
     @GetMapping("/cliente/{clienteId}/activas")
-    public ResponseEntity<List<Cuenta>> getCuentasActivasByCliente(@PathVariable Long clienteId) {
-        List<Cuenta> cuentas = cuentaService.getCuentasActivasByClienteId(clienteId);
+    public ResponseEntity<List<CuentaDTO>> getCuentasActivasByCliente(@PathVariable Long clienteId) {
+        List<CuentaDTO> cuentas = cuentaService.getCuentasActivasByClienteId(clienteId);
         return ResponseEntity.ok(cuentas);
     }
     
     @PutMapping("/{numeroCuenta}")
-    public ResponseEntity<Cuenta> actualizarCuenta(
+    public ResponseEntity<CuentaDTO> actualizarCuenta(
             @PathVariable String numeroCuenta,
             @Valid @RequestBody CuentaDTO cuentaDTO) {
         try {
-            Cuenta cuenta = cuentaService.actualizarCuenta(numeroCuenta, cuentaDTO);
+        	CuentaDTO cuenta = cuentaService.actualizarCuenta(numeroCuenta, cuentaDTO);
             return ResponseEntity.ok(cuenta);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

@@ -57,45 +57,85 @@ public class CuentaServiceImpl implements CuentaService{
     }
 
     @Transactional(readOnly = true)
-    public List<Cuenta> getAllCuentas() {
-        return cuentaRepository.findAll();
+    public List<CuentaDTO> getAllCuentas() {
+        List<Cuenta> cuentas = cuentaRepository.findAll();
+        return cuentas.stream()
+                      .map(cuenta -> {
+                          CuentaDTO dto = mapper.map(cuenta, CuentaDTO.class);
+                          if (cuenta.getCliente() != null) {
+                              dto.setClienteId(cuenta.getCliente().getClienteId());
+                          }
+                          return dto;
+                      })
+                      .toList();
     }
+
+
 
     @Transactional(readOnly = true)
-    public Optional<Cuenta> getCuentaByNumero(String numeroCuenta) {
-        return cuentaRepository.findByNumeroCuenta(numeroCuenta);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Cuenta> getCuentasByClienteId(Long clienteId) {
-        return cuentaRepository.findByClienteClienteId(clienteId);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Cuenta> getCuentasActivasByClienteId(Long clienteId) {
-        return cuentaRepository.findCuentasActivasPorCliente(clienteId);
-    }
-
-    @Transactional
-    public Cuenta actualizarCuenta(String numeroCuenta, CuentaDTO dto) {
-
+    public Optional<CuentaDTO> getCuentaByNumero(String numeroCuenta) {
         return cuentaRepository.findByNumeroCuenta(numeroCuenta)
                 .map(cuenta -> {
+                    CuentaDTO dto = mapper.map(cuenta, CuentaDTO.class);
+                    if (cuenta.getCliente() != null) {
+                        dto.setClienteId(cuenta.getCliente().getClienteId());
+                        dto.setClienteNombre(cuenta.getCliente().getNombre());
+                    }
+                    return dto;
+                });
+    }
 
-                    Consumer<Cuenta> actualizador = c -> {
-                        if (dto.getTipoCuenta() != null) {
-                            c.setTipoCuenta(dto.getTipoCuenta());
-                        }
-                        if (dto.getEstado() != null) {
-                            c.setEstado(dto.getEstado());
-                        }
-                    };
 
-                    actualizador.accept(cuenta);
+    @Transactional(readOnly = true)
+    public List<CuentaDTO> getCuentasByClienteId(Long clienteId) {
+        List<Cuenta> cuentas = cuentaRepository.findByClienteClienteId(clienteId);
+        return cuentas.stream()
+                      .map(cuenta -> {
+                          CuentaDTO dto = mapper.map(cuenta, CuentaDTO.class);
+                          if (cuenta.getCliente() != null) {
+                              dto.setClienteId(cuenta.getCliente().getClienteId());
+                              dto.setClienteNombre(cuenta.getCliente().getNombre());
+                          }
+                          return dto;
+                      })
+                      .toList();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<CuentaDTO> getCuentasActivasByClienteId(Long clienteId) {
+        List<Cuenta> cuentas = cuentaRepository.findCuentasActivasPorCliente(clienteId);
+        return cuentas.stream()
+                      .map(cuenta -> {
+                          CuentaDTO dto = mapper.map(cuenta, CuentaDTO.class);
+                          if (cuenta.getCliente() != null) {
+                              dto.setClienteId(cuenta.getCliente().getClienteId());
+                              dto.setClienteNombre(cuenta.getCliente().getNombre());
+                          }
+                          return dto;
+                      })
+                      .toList();
+    }
+
+
+    @Transactional
+    public CuentaDTO actualizarCuenta(String numeroCuenta, CuentaDTO dto) {
+        Cuenta cuentaActualizada = cuentaRepository.findByNumeroCuenta(numeroCuenta)
+                .map(cuenta -> {
+                    if (dto.getTipoCuenta() != null) cuenta.setTipoCuenta(dto.getTipoCuenta());
+                    if (dto.getEstado() != null) cuenta.setEstado(dto.getEstado());
                     return cuentaRepository.save(cuenta);
                 })
                 .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
+
+        CuentaDTO dtoActualizado = mapper.map(cuentaActualizada, CuentaDTO.class);
+        if (cuentaActualizada.getCliente() != null) {
+            dtoActualizado.setClienteId(cuentaActualizada.getCliente().getClienteId());
+            dtoActualizado.setClienteNombre(cuentaActualizada.getCliente().getNombre());
+        }
+        return dtoActualizado;
     }
+
 
     @Transactional
     public void eliminarCuenta(String numeroCuenta) {
