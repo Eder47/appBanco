@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bancario.dto.ReporteDTO;
 import com.bancario.dto.ReporteRequestDTO;
+import com.bancario.service.ReportePdfService;
 import com.bancario.service.ReporteService;
 
 import jakarta.validation.Valid;
@@ -31,6 +32,10 @@ public class ReporteController {
     
 	@Autowired
     private ReporteService reporteService;
+	
+	@Autowired
+	private ReportePdfService reportePdfService;
+
     
     @GetMapping
     public ResponseEntity<List<ReporteDTO>> generarReporteJSON(@Valid ReporteRequestDTO request) {
@@ -39,12 +44,17 @@ public class ReporteController {
     }
     
     @PostMapping("/pdf")
-    public ResponseEntity<List<ReporteDTO>> generarReportePDF(
-            @Valid @RequestBody ReporteRequestDTO request) {
+    public ResponseEntity<byte[]> generarReportePDF(@Valid @RequestBody ReporteRequestDTO request) {
 
         List<ReporteDTO> lista = reporteService.generarReportePDF(request);
-        return ResponseEntity.ok(lista);
+        byte[] pdf = reportePdfService.generarPdf(lista);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=reporte.pdf")
+                .header("Content-Type", "application/pdf")
+                .body(pdf);
     }
+
 
 
 
