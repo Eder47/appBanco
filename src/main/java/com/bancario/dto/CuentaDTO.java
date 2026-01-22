@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 public class CuentaDTO {
 
-    // Datos de Cuenta
     @NotBlank(message = "Número de cuenta es requerido")
     @Pattern(regexp = "^\\d{6,20}$", message = "Número de cuenta inválido")
     private String numeroCuenta;
@@ -19,12 +18,12 @@ public class CuentaDTO {
     @DecimalMin(value = "0.0", message = "Saldo no puede ser negativo")
     private Double saldoInicial;
 
-    private Double saldoDisponible; // Para el response
+    private Double saldoDisponible;
 
     private Boolean estado = true;
 
     private Long clienteId;
 
-    private String clienteNombre;   // Campos extra para mostrar en la respuesta
-    private String clienteEmail;    // Si quieres más, puedes agregar aquí
+    private String clienteNombre;
+    private String clienteEmail;
 }

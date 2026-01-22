@@ -2,7 +2,6 @@ package com.bancario.service.impl;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;

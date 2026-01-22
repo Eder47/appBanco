@@ -11,7 +11,6 @@ import com.bancario.controller.TipoMovimiento;
 import com.bancario.dto.MovimientoDTO;
 import com.bancario.dto.ReporteDTO;
 import com.bancario.dto.ReporteRequestDTO;
-import com.bancario.model.Movimiento;
 import com.bancario.service.ReporteService;
 
 import lombok.RequiredArgsConstructor;

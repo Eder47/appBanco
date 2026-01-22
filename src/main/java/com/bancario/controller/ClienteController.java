@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bancario.dto.ClienteDTO;
-import com.bancario.model.Cliente;
 import com.bancario.service.ClienteService;
 
 import jakarta.validation.Valid;
